@@ -8,7 +8,7 @@ Data sources used:
 """
 #!flask/bin/python
 #!bin/bash/python
-from flask import Flask
+from flask import Flask, jsonify
 from flask_cors import CORS
 from googletrans import Translator
 t = Translator()
@@ -26,32 +26,29 @@ def getSource():
     soup.prettify()
     return soup
 
-def translateChinese(data, province=False):
+def translateChinese(data):
+    t = Translator();
+
     for k, v in enumerate(data):
         v['provinceName'] = t.translate(v['provinceName']).text
         v['provinceShortName'] = t.translate(v['provinceShortName']).text
 
-        if(province):
-            for q, w in enumerate(v['cities']):
-                w['cityName'] = t.translate(w['cityName']).text
+    t.session.close()
     return data
 
 @app.route('/data/chinese-provinces/', methods=['GET'])
 def getDxyProvinces():
     soup = getSource()
     dxyJSON = json.loads(soup.select("#getAreaStat")[0].text[27:][:-11])
-    dxy = translateChinese(dxyJSON, True)
-    return json.dumps(dxy)
+    dxyJSON = translateChinese(dxyJSON)
+    return json.dumps(dxyJSON)
 
 
 @app.route('/data/other-countries/', methods=['GET'])
 def getDxyCountries():
     soup = getSource()
     dxyJSON = json.loads(soup.select("#getListByCountryTypeService2")[0].text[44:][:-11])
-
-    for k, v in enumerate(dxyJSON, False):
-        v["provinceName"] = t.translate(v["provinceName"]).text
-
+    dxyJSON = translateChinese(dxyJSON)
     return json.dumps(dxyJSON)
 
 @app.route('/')
