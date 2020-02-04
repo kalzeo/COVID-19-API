@@ -2,13 +2,13 @@
 @author Kyle McPherson
 
 Data sources used:
-+ https://3g.dxy.cn/newh5/view/pneumonia - Real time Live media update - best source for China official numbers.
++ http://ncov.dxy.cn/ncovh5/view/pneumonia - Real time Live media update - best source for China official numbers.
   Data hardcoded in HTML, can be accessed from console.log(window.getAreaStat)
   Updated everyday at 5PM GMT+1 (midnight Beijing)
 """
 #!flask/bin/python
 #!bin/bash/python
-from flask import Flask, jsonify
+from flask import Flask
 from flask_cors import CORS
 from googletrans import Translator
 t = Translator()
@@ -26,21 +26,13 @@ def getSource():
     soup.prettify()
     return soup
 
-def translateChinese(data):
-    t = Translator();
-
-    for k, v in enumerate(data):
-        v['provinceName'] = t.translate(v['provinceName']).text
-        v['provinceShortName'] = t.translate(v['provinceShortName']).text
-
-    t.session.close()
-    return data
-
 @app.route('/data/chinese-provinces/', methods=['GET'])
 def getDxyProvinces():
     soup = getSource()
     dxyJSON = json.loads(soup.select("#getAreaStat")[0].text[27:][:-11])
-    dxyJSON = translateChinese(dxyJSON)
+    for k,v in enumerate(dxyJSON):
+        t = Translator()
+        v['provinceName'] = t.translate(v['provinceName']).text
     return json.dumps(dxyJSON)
 
 
@@ -48,7 +40,9 @@ def getDxyProvinces():
 def getDxyCountries():
     soup = getSource()
     dxyJSON = json.loads(soup.select("#getListByCountryTypeService2")[0].text[44:][:-11])
-    dxyJSON = translateChinese(dxyJSON)
+    for k,v in enumerate(dxyJSON):
+        t = Translator()
+        v['provinceName'] = t.translate(v['provinceName']).text
     return json.dumps(dxyJSON)
 
 @app.route('/')
