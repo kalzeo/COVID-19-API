@@ -49,7 +49,9 @@ def getDxyCountries():
 def main():
     endpoints = f"<h1><u>API Endpoints</u></h1>Chinese Province Information & Cities - <span style='color:red'>/data/chinese-provinces/</span>\
     <br>Countries Affected Outwith China - <span style='color:red'>/data/other-countries/</span>"
-    return endpoints
+
+    howTo = f"<br><br><h1><u>How To Use</u></h1>Add the endpoint to the end of the URL - <span style='color:red'>https://kalzeo.pythonanywhere.com/[ENDPOINT]</span>"
+    return endpoints + howTo
 
 if __name__ == '__main__':
     app.run()
