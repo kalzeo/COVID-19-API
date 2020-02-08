@@ -51,18 +51,17 @@ def getOverallNumbers():
     soup = getSource()
     data = []
     numbers = json.loads(soup.select("#getStatisticsService")[0].text[36:][:-11])
+    data.append({"totalCases": numbers['confirmedCount'], "suspectedCases": numbers['suspectedCount'], "curedCases": numbers['curedCount'],
+                     "severeCases": numbers['seriousCount'], "totalDead": numbers['deadCount'], "totalCasesDailyIncr": numbers['confirmedIncr'],
+                     "suspectedCasesDailyIncr": numbers['suspectedIncr'], "curedCasesDailyIncr": numbers['curedIncr'],
+                     "severeCasesDailyIncr": numbers['seriousIncr'], "totalDeadDailyIncr": numbers['deadIncr']})
 
-    for k, v in enumerate(numbers):
-        data.append({"totalCases": v['confirmedCount'], "suspectedCases": v['suspectedCount'], "curedCases": v['curedCount'],
-                     "severeCases": v['seriousCount'], "totalDead": v['deadCount'], "totalCasesDailyIncr": v['confirmedIncr'],
-                     "suspectedCasesDailyIncr": v['suspectedIncr'], "curedCasesDailyIncr": v['curedIncr'],
-                     "severeCasesDailyIncr": v['seriousIncr'], "totalDeadDailyIncr": v['deadIncr']})
-        
     return json.dumps(data)
 
 @app.route('/')
 def main():
-    endpoints = f"<h1><u>API Endpoints</u></h1>Location Data - <span style='color:red'>/api/location-data/</span>"
+    endpoints = f"<h1><u>API Endpoints</u></h1>Location Data - <span style='color:red'>/api/location-data/</span>" \
+                f"<br>Overall Numbers - <span style='color:red'>/api/overall-numbers/</span>"
 
     howTo = f"<br><br><h1><u>How To Use</u></h1>Add the endpoint to the end of the URL - <span style='color:red'>https://kalzeo.pythonanywhere.com/[ENDPOINT]</span>"
     return endpoints + howTo
