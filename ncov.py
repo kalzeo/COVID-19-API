@@ -1,6 +1,5 @@
 """
 @author Kyle McPherson
-
 Data sources used:
 + http://ncov.dxy.cn/ncovh5/view/pneumonia - Real time Live media update - best source for China official numbers.
   Data hardcoded in HTML, can be accessed from console.log(window.getAreaStat)
@@ -10,8 +9,7 @@ Data sources used:
 #!bin/bash/python
 from flask import Flask
 from flask_cors import CORS
-from googletrans import Translator
-t = Translator()
+from googletransx import Translator
 
 app = Flask(__name__)
 CORS(app)
@@ -26,29 +24,31 @@ def getSource():
     soup.prettify()
     return soup
 
-@app.route('/data/chinese-provinces/', methods=['GET'])
-def getDxyProvinces():
+@app.route('/api/location-data/', methods=['GET'])
+def getLocationData():
     soup = getSource()
-    dxyJSON = json.loads(soup.select("#getAreaStat")[0].text[27:][:-11])
-    for k,v in enumerate(dxyJSON):
-        t = Translator()
-        v['provinceName'] = t.translate(v['provinceName']).text
-    return json.dumps(dxyJSON)
+    data = []
+    dxyCountries = json.loads(soup.select("#getListByCountryTypeService2")[0].text[44:][:-11])
+    dxyProvinces = json.loads(soup.select("#getAreaStat")[0].text[27:][:-11])
 
+    for k, v in enumerate(dxyCountries):
+        translate = Translator()
+        countryName = translate.translate(v['provinceName']).text
+        data.append({"location": countryName, "infected": v['confirmedCount'], "cured": v['curedCount'],
+             "dead": v['deadCount'], "type": "Country"})
 
-@app.route('/data/other-countries/', methods=['GET'])
-def getDxyCountries():
-    soup = getSource()
-    dxyJSON = json.loads(soup.select("#getListByCountryTypeService2")[0].text[44:][:-11])
-    for k,v in enumerate(dxyJSON):
-        t = Translator()
-        v['provinceName'] = t.translate(v['provinceName']).text
-    return json.dumps(dxyJSON)
+    for k, v in enumerate(dxyProvinces):
+        translator = Translator()
+        name = translator.translate(v['provinceName']).text
+        data.append(
+            {"location": name, "infected": v['confirmedCount'], "cured": v['curedCount'],
+             "dead": v['deadCount'], "type": "Province"})
+
+    return json.dumps(data)
 
 @app.route('/')
 def main():
-    endpoints = f"<h1><u>API Endpoints</u></h1>Chinese Province Information & Cities - <span style='color:red'>/data/chinese-provinces/</span>\
-    <br>Countries Affected Outwith China - <span style='color:red'>/data/other-countries/</span>"
+    endpoints = f"<h1><u>API Endpoints</u></h1>Location Data - <span style='color:red'>/api/location-data/</span>"
 
     howTo = f"<br><br><h1><u>How To Use</u></h1>Add the endpoint to the end of the URL - <span style='color:red'>https://kalzeo.pythonanywhere.com/[ENDPOINT]</span>"
     return endpoints + howTo
