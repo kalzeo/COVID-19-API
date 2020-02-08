@@ -46,6 +46,20 @@ def getLocationData():
 
     return json.dumps(data)
 
+@app.route('/api/overall-numbers/', methods=['GET'])
+def getOverallNumbers():
+    soup = getSource()
+    data = []
+    numbers = json.loads(soup.select("#getStatisticsService")[0].text[36:][:-11])
+
+    for k, v in enumerate(numbers):
+        data.append({"totalCases": v['confirmedCount'], "suspectedCases": v['suspectedCount'], "curedCases": v['curedCount'],
+                     "severeCases": v['seriousCount'], "totalDead": v['deadCount'], "totalCasesDailyIncr": v['confirmedIncr'],
+                     "suspectedCasesDailyIncr": v['suspectedIncr'], "curedCasesDailyIncr": v['curedIncr'],
+                     "severeCasesDailyIncr": v['seriousIncr'], "totalDeadDailyIncr": v['deadIncr']})
+        
+    return json.dumps(data)
+
 @app.route('/')
 def main():
     endpoints = f"<h1><u>API Endpoints</u></h1>Location Data - <span style='color:red'>/api/location-data/</span>"
