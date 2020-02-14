@@ -34,15 +34,24 @@ def getLocationData():
     for k, v in enumerate(dxyCountries):
         translate = Translator()
         countryName = translate.translate(v['provinceName']).text
-        data.append({"location": countryName, "infected": v['confirmedCount'], "cured": v['curedCount'],
-             "dead": v['deadCount'], "type": "Country"})
+        data.append(
+            {"place": countryName,
+             "infected": v['confirmedCount'],
+             "cured": v['curedCount'],
+             "dead": v['deadCount'],
+             "type": "Country"
+             })
 
     for k, v in enumerate(dxyProvinces):
         translator = Translator()
         name = translator.translate(v['provinceName']).text
         data.append(
-            {"location": name, "infected": v['confirmedCount'], "cured": v['curedCount'],
-             "dead": v['deadCount'], "type": "Province"})
+            {"place": name,
+             "infected": v['confirmedCount'],
+             "cured": v['curedCount'],
+             "dead": v['deadCount'],
+             "type": "Province"
+             })
 
     return json.dumps(data)
 
@@ -52,9 +61,7 @@ def getOverallNumbers():
     data = []
     numbers = json.loads(soup.select("#getStatisticsService")[0].text[36:][:-11])
     data.append({"totalCases": numbers['confirmedCount'], "suspectedCases": numbers['suspectedCount'], "curedCases": numbers['curedCount'],
-                     "severeCases": numbers['seriousCount'], "totalDead": numbers['deadCount'], "totalCasesDailyIncr": numbers['confirmedIncr'],
-                     "suspectedCasesDailyIncr": numbers['suspectedIncr'], "curedCasesDailyIncr": numbers['curedIncr'],
-                     "severeCasesDailyIncr": numbers['seriousIncr'], "totalDeadDailyIncr": numbers['deadIncr']})
+                     "severeCases": numbers['seriousCount'], "totalDead": numbers['deadCount']})
 
     return json.dumps(data)
 
